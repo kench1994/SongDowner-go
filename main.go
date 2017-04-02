@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"os"
 	"sync"
+	"strings"
 )
 
 const (
@@ -64,7 +65,9 @@ func main() {
 	}
 	songname :=  data["data"].(map[string]interface{})["songList"].([]interface{})[0].(map[string]interface{})["songName"].(string)
 	artistName :=  data["data"].(map[string]interface{})["songList"].([]interface{})[0].(map[string]interface{})["artistName"].(string)
-	//fmt.Println("songName: ",songname,"artistName: ",artistName)
+	songPic :=  strings.Split(data["data"].(map[string]interface{})["songList"].([]interface{})[0].(map[string]interface{})["songPicRadio"].(string),"@")[0]
+
+	fmt.Println("songName: ",songname,"artistName: ",artistName,"songPic: ",songPic)
 
 
 	waitGroup := sync.WaitGroup{}
@@ -102,11 +105,11 @@ func main() {
 		return
 	}
 	fmt.Println(songname,"下载完成,文件大小：",fmt.Sprintf("%.2f", float64(written)/(1024*1024)),"MB")
-	waitGroup.Wait()
+	//waitGroup.Wait()
 
 	//}()
 
-	//waitGroup.Wait()
+	waitGroup.Wait()
 
 }
 
