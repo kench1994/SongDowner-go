@@ -64,7 +64,7 @@ func main() {
 	}
 	songname :=  data["data"].(map[string]interface{})["songList"].([]interface{})[0].(map[string]interface{})["songName"].(string)
 	artistName :=  data["data"].(map[string]interface{})["songList"].([]interface{})[0].(map[string]interface{})["artistName"].(string)
-	fmt.Println("songName: ",songname,"artistName: ",artistName)
+	//fmt.Println("songName: ",songname,"artistName: ",artistName)
 
 
 	waitGroup := sync.WaitGroup{}
@@ -77,29 +77,36 @@ func main() {
 	}
 	dir, _ := os.Getwd()
 	dir = dir +path+"songs"
+	if _,err := os.Stat(dir);err != nil{
+		err = os.Mkdir(dir, os.ModePerm)
+		if err != nil {
+			fmt.Println("创建目录失败：",err)
+			return
+		}
+	}
 	filename := dir + path + songname+" - "+artistName+".flac"
 	fmt.Println(filename)
-	go func() {
-		fmt.Println("正在下载 ", songname," ......")
-		defer waitGroup.Done()
+	//go func() {
+	fmt.Println("正在下载 ", songname," ......")
+	defer waitGroup.Done()
 
-		songRes ,err:= http.Get(songlink)
-		if err != nil {
-			fmt.Println("下载文件时出错：",songlink)
-			return
-		}
-		songFile,err := os.Create(filename)
-		written,err := io.Copy(songFile,songRes.Body)
-		if err != nil {
-			fmt.Println("保存音乐文件时出错：",err)
-			return
-		}
-		fmt.Println(songname,"下载完成,文件大小：",fmt.Sprintf("%.2f", float64(written)/(1024*1024)),"MB")
-		waitGroup.Wait()
-
-	}()
-
+	songRes ,err:= http.Get(songlink)
+	if err != nil {
+		fmt.Println("下载文件时出错：",songlink)
+		return
+	}
+	songFile,err := os.Create(filename)
+	written,err := io.Copy(songFile,songRes.Body)
+	if err != nil {
+		fmt.Println("保存音乐文件时出错：",err)
+		return
+	}
+	fmt.Println(songname,"下载完成,文件大小：",fmt.Sprintf("%.2f", float64(written)/(1024*1024)),"MB")
 	waitGroup.Wait()
+
+	//}()
+
+	//waitGroup.Wait()
 
 }
 
@@ -174,4 +181,3 @@ func DownloadString(remoteUrl string, queryVaules url.Values) (body []byte, err 
 	}
 	return
 }
-
